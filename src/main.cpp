@@ -12,9 +12,14 @@ pros::MotorGroup rightMotors({5, 4, 13}, pros::MotorGearset::blue); // right mot
 // Inertial Sensor on port 10
 pros::Imu imu(10);
 
-
 pros::Motor Intakeb(-1);
 pros::Motor Intakef(10);
+
+pros::ADIDigitalOut Descore('B');
+pros::ADIDigitalOut Matchload('A');
+
+bool descore_state = false;
+bool matchload_state = false;
 
 // tracking wheels
 // horizontal tracking wheel encoder. Rotation sensor, port 20, not reversed
@@ -171,6 +176,33 @@ void autonomous() {
 
 
 
+
+//driver controls:
+
+void set_both(int32_t voltage) {
+    Intakef.move_voltage(voltage);
+    Intakeb.move_voltage(voltage);
+}
+
+void set_intakeb(int32_t voltage) { 
+    Intakeb.move_voltage(voltage); 
+}
+
+void set_intakef(int32_t voltage) { 
+    Intakef.move_voltage(voltage); 
+}
+
+void toggle_matchload() {
+    matchload_state = !matchload_state;
+    Matchload.set_value(matchload_state);
+}
+
+void toggle_descore() {
+    descore_state = !descore_state;
+    Descore.set_value(descore_state);
+}
+
+
 void opcontrol() {
     // controller
     // loop to continuously update motors
@@ -180,6 +212,31 @@ void opcontrol() {
         int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
         // move the chassis with curvature drive
         chassis.arcade(leftY, rightX);
+
+        //BUTTON CONTROL:
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) { 
+            toggle_descore(); 
+        }
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) { 
+            toggle_matchload(); 
+        }
+
+
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+            set_intakef(12000);
+
+        } 
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+            Intakef.move_velocity(-200);
+            Intakeb.move_velocity(-50);
+        } 
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+            set_both(12000);
+        } 
+        else {
+            set_both(0);
+        }
+
         // delay to save resources
         pros::delay(10);
     }
