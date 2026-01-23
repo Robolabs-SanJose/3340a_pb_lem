@@ -139,11 +139,21 @@ ASSET(example_txt); // '.' replaced with "_" to make c++ happy
  *
  * This is an example autonomous routine which demonstrates a lot of the features LemLib has to offer
  */
-void autonomous() {
+void right() {
     chassis.setPose(0, 0, 0);
+}
+void left() {
+    chassis.setPose(0, 0, 0);
+}
+void inch(){
+    chassis.setPose(0,0, 0);
+    chassis.moveToPose(0, 5, 0, 1000);
+}
+void autonomous() {
+    // chassis.setPose(0, 0, 0);
     // chassis.moveToPose();
     //  Move to x: 20 and y: 15, and face heading 90. Timeout set to 4000 ms
-    chassis.moveToPose(65, -20, 0, 4000);
+    // chassis.moveToPose(65, -20, 0, 4000);
     // Move to x: 0 and y: 0 and face heading 270, going backwards. Timeout set to 4000ms
     // chassis.moveToPose(0, 0, 270, 4000, {.forwards = false});
     // cancel the movement after it has traveled 10 inches
@@ -168,6 +178,10 @@ void autonomous() {
     // wait until the movement is done
     // chassis.waitUntilDone();
     // pros::lcd::print(4, "pure pursuit finished!");
+    //---------------------------------------------------------------
+    // right();
+    // left();
+    // inch();
 }
 
 /**
