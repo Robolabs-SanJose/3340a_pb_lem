@@ -5,21 +5,23 @@
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 // motor groups
-pros::MotorGroup leftMotors({-8, -20, -3},
+pros::MotorGroup leftMotors({-8, -17, -2},
                             pros::MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
 pros::MotorGroup rightMotors({5, 4, 7}, pros::MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
 
 // Inertial Sensor on port 10
-pros::Imu imu(18);
+pros::Imu imu(12);
 
 pros::Motor Intakeb(-1);
 pros::Motor Intakef(6);
 
 pros::ADIDigitalOut Descore('B');
 pros::ADIDigitalOut Matchload('A');
+pros::ADIDigitalOut Middle('C');
 
 bool descore_state = false;
 bool matchload_state = false;
+bool middle_state=false;
 
 // tracking wheels
 // horizontal tracking wheel encoder. Rotation sensor, port 20, not reversed
@@ -29,7 +31,7 @@ pros::Rotation verticalEnc(-11);
 // horizontal tracking wheel. 2.75" diameter, 5.75" offset, back of the robot (negative)
 lemlib::TrackingWheel horizontal(&horizontalEnc, lemlib::Omniwheel::NEW_275, -5.75);
 // vertical tracking wheel. 2.75" diameter, 2.5" offset, left of the robot (negative)
-lemlib::TrackingWheel vertical(&verticalEnc, lemlib::Omniwheel::NEW_275, -2.5);
+lemlib::TrackingWheel vertical(&verticalEnc,lemlib::Omniwheel::NEW_275, -2.5) ;
 
 // drivetrain settings
 lemlib::Drivetrain drivetrain(&leftMotors, // left motor group
@@ -149,6 +151,11 @@ void inch(){
     chassis.setPose(0,0, 0);
     chassis.moveToPose(0, 5, 0, 1000);
 }
+
+void autontest(){
+    chassis.setPose(0,0,0);
+    chassis.moveToPose(0, 24, 0, 1000);
+}
 void autonomous() {
     // chassis.setPose(0, 0, 0);
     // chassis.moveToPose();
@@ -182,6 +189,7 @@ void autonomous() {
     // right();
     // left();
     // inch();
+    autontest();
 }
 
 /**
@@ -211,6 +219,11 @@ void toggle_descore() {
     Descore.set_value(descore_state);
 }
 
+void toggle_middle() {
+    middle_state = !middle_state;
+    Middle.set_value(middle_state);
+}
+
 void opcontrol() {
     // controller
     // loop to continuously update motors
@@ -224,6 +237,7 @@ void opcontrol() {
         // BUTTON CONTROL:
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) { toggle_descore(); }
         if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) { toggle_matchload(); }
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) { toggle_middle(); }
 
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
             set_intakef(12000);
